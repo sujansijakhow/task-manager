@@ -32,7 +32,7 @@ const Register = () => {
           Task Manager Register
         </h1>
         <p className="text-center text-gray-500 mb-6">
-          Create your account to manage your tasks efficiently
+          Create your account to manage your tasks
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
