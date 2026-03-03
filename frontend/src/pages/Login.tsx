@@ -1,9 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../features/auth/authSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -17,8 +21,14 @@ const Login = () => {
       );
 
       console.log("Login success:", response.data);
-      // Temporarily save token
-      localStorage.setItem("token", response.data.token);
+
+      dispatch(
+        login({
+          token: response.data.token,
+          email: email,
+        })
+      );
+
       navigate("/dashboard");
     } catch (error: any) {
       console.error("Login error:", error.response?.data || error.message);
@@ -32,6 +42,7 @@ const Login = () => {
         <h1 className="text-3xl font-bold text-center text-primary mb-6">
           Task Manager
         </h1>
+
         <p className="text-center text-gray-500 mb-6">
           Login to manage your tasks efficiently
         </p>
@@ -43,7 +54,7 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
           <input
@@ -52,12 +63,12 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
 
           <button
             type="submit"
-            className="w-full bg-primary text-white py-3 rounded-md hover:bg-primary-dark transition-colors"
+            className="w-full bg-primary text-white py-3 rounded-md hover:opacity-90 transition"
           >
             Login
           </button>
@@ -65,7 +76,10 @@ const Login = () => {
 
         <p className="text-center text-gray-500 mt-4">
           Don't have an account?{" "}
-          <Link to="/register" className="text-primary font-semibold hover:underline">
+          <Link
+            to="/register"
+            className="text-primary font-semibold hover:underline"
+          >
             Register here
           </Link>
         </p>
