@@ -4,6 +4,9 @@ import cors from "cors";
 
 import authRoutes from "./auth/auth.routes";
 import { protect } from "./auth/auth.middleware";
+import taskRoutes from "./routes/taskRoutes";
+
+
 
 dotenv.config();
 
@@ -13,6 +16,7 @@ app.use(express.json());
 
 // Public routes
 app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes)
 
 app.get("/dashboard", protect, (req, res) => {
   res.json({ message: "Welcome to the dashboard", user: (req as any).user });
