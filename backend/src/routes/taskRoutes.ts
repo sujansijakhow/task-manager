@@ -5,7 +5,7 @@ import {
   updateTask,
   deleteTask,
 } from "../controllers/taskController";
-import { protect } from "../auth/auth.middleware"; 
+import { protect } from "../auth/auth.middleware";
 
 const router = express.Router();
 
