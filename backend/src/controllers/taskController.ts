@@ -1,47 +1,72 @@
 import { Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
 
-let tasks: any[] = [];
+interface Task {
+  id: string;
+  title: string;
+  projectId: string;
+  priority: "low" | "medium" | "high";
+  status: "pending" | "completed";
+  createdAt: string;
+}
 
-// CREATE TASK
+let tasks: Task[] = []; 
+
+// Create task
 export const createTask = (req: Request, res: Response) => {
-  const { title } = req.body;
+  const { title, projectId, priority } = req.body;
 
-  const task = {
-    id: Date.now().toString(),
+  if (!title || !priority || !projectId) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  const newTask: Task = {
+    id: uuidv4(),
     title,
-    completed: false,
-    user: req.user?.email, 
+    projectId,
+    priority,
+    status: "pending",
+    createdAt: new Date().toISOString(),
   };
 
-  tasks.push(task);
-
-  res.status(201).json(task);
+  tasks.push(newTask);
+  res.status(201).json(newTask);
 };
 
-// GET TASKS
+// Get tasks (optional filter by project or status)
 export const getTasks = (req: Request, res: Response) => {
-  const userTasks = tasks.filter(
-    (task) => task.user === req.user?.email
-  );
+  const { projectId, status } = req.query;
+  let filtered = tasks;
 
-  res.json(userTasks);
+  if (projectId) {
+    filtered = filtered.filter((t) => t.projectId === projectId);
+  }
+
+  if (status) {
+    filtered = filtered.filter((t) => t.status === status);
+  }
+
+  res.json(filtered);
 };
 
-// UPDATE TASK
+// Update task (title, priority, status)
 export const updateTask = (req: Request, res: Response) => {
-  const task = tasks.find((t) => t.id === req.params.id);
+  const { id } = req.params;
+  const { title, priority, status } = req.body;
 
+  const task = tasks.find((t) => t.id === id);
   if (!task) return res.status(404).json({ message: "Task not found" });
 
-  task.completed = req.body.completed ?? task.completed;
-  task.title = req.body.title ?? task.title;
+  if (title) task.title = title;
+  if (priority) task.priority = priority;
+  if (status) task.status = status;
 
   res.json(task);
 };
 
-// DELETE TASK
+// Delete task
 export const deleteTask = (req: Request, res: Response) => {
-  tasks = tasks.filter((t) => t.id !== req.params.id);
-
+  const { id } = req.params;
+  tasks = tasks.filter((t) => t.id !== id);
   res.json({ message: "Task deleted" });
 };
