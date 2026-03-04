@@ -1,13 +1,22 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { fetchTasks, addTask, deleteTask, updateTask } from "../features/task/taskSlice";
+import {
+  fetchTasks,
+  addTask,
+  deleteTask,
+  updateTask,
+} from "../features/task/taskSlice";
 import { logout } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { FiLogOut, FiMoreVertical } from "react-icons/fi";
 
+import TaskForm from "../components/TaskForm";
+import TaskList from "../components/TaskList";
+
 const Dashboard = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const { tasks, loading } = useAppSelector((state) => state.tasks);
   const { email } = useAppSelector((state) => state.auth);
 
@@ -22,21 +31,30 @@ const Dashboard = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
+  // Fetch Tasks
   useEffect(() => {
     dispatch(fetchTasks());
   }, [dispatch]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
-      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+      if (
+        sortRef.current &&
+        !sortRef.current.contains(event.target as Node)
+      ) {
         setSortOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleAdd = useCallback(() => {
@@ -47,34 +65,67 @@ const Dashboard = () => {
     }
   }, [title, priority, dispatch]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
-  };
-
   const toggleStatus = useCallback(
     (id: string, status: string) => {
-      dispatch(updateTask({ id, status: status === "pending" ? "completed" : "pending" }));
+      dispatch(
+        updateTask({
+          id,
+          status: status === "pending" ? "completed" : "pending",
+        })
+      );
     },
     [dispatch]
   );
+
+  // Delete Task
+  const handleDelete = useCallback(
+    (id: string) => {
+      dispatch(deleteTask(id));
+    },
+    [dispatch]
+  );
+
+  const handleLogout = useCallback(() => {
+    dispatch(logout());
+    navigate("/login");
+  }, [dispatch, navigate]);
 
   const priorityOrder = { high: 3, medium: 2, low: 1 };
 
   const processedTasks = useMemo(() => {
     return [...tasks]
-      .filter((task) => (filter === "all" ? true : task.status === filter))
+      .filter((task) =>
+        filter === "all" ? true : task.status === filter
+      )
       .sort((a, b) => {
         if (sort === "latest")
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() -
+            new Date(a.createdAt).getTime()
+          );
         if (sort === "oldest")
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        if (sort === "priority") return priorityOrder[b.priority] - priorityOrder[a.priority];
+          return (
+            new Date(a.createdAt).getTime() -
+            new Date(b.createdAt).getTime()
+          );
+        if (sort === "priority")
+          return (
+            priorityOrder[b.priority] -
+            priorityOrder[a.priority]
+          );
         return 0;
       });
   }, [tasks, filter, sort]);
 
-  const emailInitial = email ? email.charAt(0).toUpperCase() : "U"
+  // Stats
+  const totalTasks = useMemo(() => tasks.length, [tasks]);
+  const completedTasks = useMemo(
+    () => tasks.filter((t) => t.status === "completed").length,
+    [tasks]
+  );
+  const pendingTasks = totalTasks - completedTasks;
+
+  const emailInitial = email ? email.charAt(0).toUpperCase() : "U";
 
   const priorityStyle = useMemo(
     () => ({
@@ -85,19 +136,16 @@ const Dashboard = () => {
     []
   );
 
-  const totalTasks = useMemo(() => tasks.length, [tasks]);
-  const completedTasks = useMemo(() => tasks.filter((t) => t.status === "completed").length, [tasks]);
-  const pendingTasks = useMemo(() => totalTasks - completedTasks, [totalTasks, completedTasks]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-10">
       <div className="max-w-4xl mx-auto">
 
-        {/* Header */}
         <div className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-bold">Welcome</h1>
-            <p className="text-gray-500 text-sm">Manage Your task Efficiently</p>
+            <p className="text-gray-500 text-sm">
+              Manage Your task Efficiently
+            </p>
           </div>
 
           <div className="relative" ref={dropdownRef}>
@@ -110,15 +158,19 @@ const Dashboard = () => {
 
             {open && (
               <div className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-lg p-4 z-50">
-                <p className="text-sm text-gray-500 mb-1">Signed in as</p>
-                <p className="font-medium break-all mb-4">{email}</p>
+                <p className="text-sm text-gray-500 mb-1">
+                  Signed in as
+                </p>
+                <p className="font-medium break-all mb-4">
+                  {email}
+                </p>
 
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 text-red-500 hover:text-red-700 transition"
                 >
                   <FiLogOut size={14} />
-                  <span>Logout</span>
+                  Logout
                 </button>
               </div>
             )}
@@ -126,64 +178,55 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+          <div className="bg-white p-5 rounded-xl shadow">
             <p className="text-gray-500 text-sm">Total Tasks</p>
-            <h2 className="text-2xl font-bold">{totalTasks}</h2>
+            <h2 className="text-2xl font-bold">
+              {totalTasks}
+            </h2>
           </div>
 
-          <div className="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+          <div className="bg-white p-5 rounded-xl shadow">
             <p className="text-gray-500 text-sm">Completed</p>
-            <h2 className="text-2xl font-bold text-green-600">{completedTasks}</h2>
+            <h2 className="text-2xl font-bold text-green-600">
+              {completedTasks}
+            </h2>
           </div>
 
-          <div className="bg-white p-5 rounded-xl shadow hover:shadow-md transition">
+          <div className="bg-white p-5 rounded-xl shadow">
             <p className="text-gray-500 text-sm">Pending</p>
-            <h2 className="text-2xl font-bold text-yellow-600">{pendingTasks}</h2>
+            <h2 className="text-2xl font-bold text-yellow-600">
+              {pendingTasks}
+            </h2>
           </div>
         </div>
 
-        {/* Add Task */}
-        <div className="bg-white p-6 rounded-xl shadow mb-8 flex gap-3">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="What needs to be done?"
-            className="flex-1 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none"
-          />
-
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value as any)}
-            className="border rounded-lg px-3 py-2"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-
-          <button
-            onClick={handleAdd}
-            className="bg-primary text-white px-6 rounded-lg hover:scale-105 transition"
-          >
-            Add
-          </button>
-        </div>
+        <TaskForm
+          title={title}
+          priority={priority}
+          setTitle={setTitle}
+          setPriority={setPriority}
+          onAdd={handleAdd}
+        />
 
         {/* Filters + Sort */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex gap-3">
-            {(["all", "pending", "completed"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-1 rounded-full text-sm font-medium ${filter === f
-                  ? "bg-primary text-white"
-                  : "bg-white shadow text-gray-600"
+            {(["all", "pending", "completed"] as const).map(
+              (f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-4 py-1 rounded-full text-sm font-medium ${
+                    filter === f
+                      ? "bg-primary text-white"
+                      : "bg-white shadow text-gray-600"
                   }`}
-              >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
+                >
+                  {f.charAt(0).toUpperCase() +
+                    f.slice(1)}
+                </button>
+              )
+            )}
           </div>
 
           <div className="relative" ref={sortRef}>
@@ -196,8 +239,11 @@ const Dashboard = () => {
 
             {sortOpen && (
               <div className="absolute right-0 mt-2 bg-white shadow-xl rounded-xl w-48 overflow-hidden z-50">
-                <div className="px-4 py-2 text-sm font-semibold text-gray-600">Sort By</div>
+                <div className="px-4 py-2 text-sm font-semibold text-gray-600">
+                  Sort By
+                </div>
                 <div className="border-t border-gray-200"></div>
+
                 {[
                   { label: "Priority", value: "priority" },
                   { label: "Latest", value: "latest" },
@@ -205,9 +251,15 @@ const Dashboard = () => {
                 ].map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => { setSort(option.value as any); setSortOpen(false); }}
-                    className={`w-full text-left px-4 py-2 text-sm transition
-                      ${sort === option.value ? "bg-primary text-white" : "hover:bg-gray-100 text-gray-700"}`}
+                    onClick={() => {
+                      setSort(option.value as any);
+                      setSortOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm transition ${
+                      sort === option.value
+                        ? "bg-primary text-white"
+                        : "hover:bg-gray-100 text-gray-700"
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -217,55 +269,15 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Task List */}
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <ul className="space-y-4">
-            {processedTasks.map((task) => (
-              <li
-                key={task.id}
-                className="bg-white p-5 rounded-xl shadow flex justify-between items-center hover:shadow-lg transition"
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    onClick={() => toggleStatus(task.id, task.status)}
-                    className={`w-4 h-4 flex items-center justify-center rounded-full border-2 cursor-pointer ${task.status === "completed"
-                      ? "bg-green-500 border-green-500"
-                      : "border-gray-400"
-                      }`}
-                  >
-                    {task.status === "completed" && (
-                      <span className="text-white text-sm">✓</span>
-                    )}
-                  </div>
-
-                  <span
-                    className={`text-lg ${task.status === "completed"
-                      ? "line-through text-gray-400"
-                      : ""
-                      }`}
-                  >
-                    {task.title}
-                  </span>
-
-                  <span
-                    className={`px-3 py-1 text-xs rounded-full font-semibold ${priorityStyle[task.priority]
-                      }`}
-                  >
-                    {task.priority}
-                  </span>
-                </div>
-
-                <button
-                  onClick={() => dispatch(deleteTask(task.id))}
-                  className="text-red-500 hover:text-red-700 transition"
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
+          <TaskList
+            tasks={processedTasks}
+            onToggle={toggleStatus}
+            onDelete={handleDelete}
+            priorityStyle={priorityStyle}
+          />
         )}
       </div>
     </div>
