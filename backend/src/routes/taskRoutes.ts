@@ -12,7 +12,7 @@ const router = express.Router();
 // All routes protected by JWT
 router.post("/", protect, createTask);
 router.get("/", protect, getTasks);
-router.put("/:id", protect, updateTask);
+router.patch("/:id", protect, updateTask);
 router.delete("/:id", protect, deleteTask);
 
 export default router;
