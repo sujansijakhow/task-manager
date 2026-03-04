@@ -24,15 +24,23 @@ const initialState: TaskState = {
 // Fetch Tasks
 export const fetchTasks = createAsyncThunk("tasks/fetch", async () => {
   const response = await API.get("/");
-  return response.data;
+  return response.data as Task[];
 });
 
-// Add Task
+// Add Task 
 export const addTask = createAsyncThunk(
   "tasks/add",
-  async (title: string) => {
-    const response = await API.post("/", { title });
-    return response.data;
+  async (taskData: { title: string; priority: string; projectId: string }) => {
+    const response = await API.post("/", taskData);
+    return response.data as Task;
+  }
+);
+
+export const updateTask = createAsyncThunk(
+  "tasks/update",
+  async (taskData: { id: string; title?: string; priority?: string; status?: string }) => {
+    const response = await API.patch(`/${taskData.id}`, taskData);
+    return response.data as Task;
   }
 );
 
@@ -51,9 +59,7 @@ const taskSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTasks.pending, (state) => {
-        state.loading = true;
-      })
+      .addCase(fetchTasks.pending, (state) => { state.loading = true; })
       .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<Task[]>) => {
         state.tasks = action.payload;
         state.loading = false;
@@ -61,10 +67,12 @@ const taskSlice = createSlice({
       .addCase(addTask.fulfilled, (state, action: PayloadAction<Task>) => {
         state.tasks.push(action.payload);
       })
+      .addCase(updateTask.fulfilled, (state, action: PayloadAction<Task>) => {
+        const index = state.tasks.findIndex(t => t.id === action.payload.id);
+        if (index !== -1) state.tasks[index] = action.payload;
+      })
       .addCase(deleteTask.fulfilled, (state, action: PayloadAction<string>) => {
-        state.tasks = state.tasks.filter(
-          (task) => task.id !== action.payload
-        );
+        state.tasks = state.tasks.filter(task => task.id !== action.payload);
       });
   },
 });
