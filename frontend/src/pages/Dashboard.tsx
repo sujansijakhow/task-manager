@@ -12,6 +12,7 @@ import { FiLogOut, FiMoreVertical } from "react-icons/fi";
 
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
+import TaskSkeleton from "../components/TaskSkeleton";
 
 const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -270,7 +271,7 @@ const Dashboard = () => {
         </div>
 
         {loading ? (
-          <p>Loading...</p>
+          <TaskSkeleton count={5} />
         ) : (
           <TaskList
             tasks={processedTasks}
