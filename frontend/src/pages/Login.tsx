@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAppDispatch } from "../hooks"; 
 import { login } from "../features/auth/authSlice";
+import { fetchTasks, reset } from "../features/task/taskSlice";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -28,6 +29,9 @@ const Login = () => {
           email: email,
         })
       );
+
+      dispatch(reset());
+      dispatch(fetchTasks())
 
       navigate("/dashboard");
     } catch (error: any) {
