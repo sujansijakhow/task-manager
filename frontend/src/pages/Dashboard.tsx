@@ -5,6 +5,7 @@ import {
   addTask,
   deleteTask,
   updateTask,
+  reset,
 } from "../features/task/taskSlice";
 import { logout } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +35,11 @@ const Dashboard = () => {
 
   // Fetch Tasks
   useEffect(() => {
-    dispatch(fetchTasks());
+    dispatch(fetchTasks())
+      .unwrap()
+      .catch(() => {
+        console.log("Backend unavailable. Using local data.");
+      });
   }, [dispatch]);
 
   useEffect(() => {
@@ -88,6 +93,7 @@ const Dashboard = () => {
 
   const handleLogout = useCallback(() => {
     dispatch(logout());
+    dispatch(reset());
     navigate("/login");
   }, [dispatch, navigate]);
 
@@ -217,11 +223,10 @@ const Dashboard = () => {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-4 py-1 rounded-full text-sm font-medium ${
-                    filter === f
+                  className={`px-4 py-1 rounded-full text-sm font-medium ${filter === f
                       ? "bg-primary text-white"
                       : "bg-white shadow text-gray-600"
-                  }`}
+                    }`}
                 >
                   {f.charAt(0).toUpperCase() +
                     f.slice(1)}
@@ -256,11 +261,10 @@ const Dashboard = () => {
                       setSort(option.value as any);
                       setSortOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm transition ${
-                      sort === option.value
+                    className={`w-full text-left px-4 py-2 text-sm transition ${sort === option.value
                         ? "bg-primary text-white"
                         : "hover:bg-gray-100 text-gray-700"
-                    }`}
+                      }`}
                   >
                     {option.label}
                   </button>
