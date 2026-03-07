@@ -5,6 +5,7 @@ import { persistReducer, persistStore } from "redux-persist";
 
 import authReducer from "../features/auth/authSlice";
 import taskReducer from "../features/task/taskSlice";
+import themeReducer from "../features/theme/themeSlice"
 
 // Persist config for tasks
 const taskPersistConfig = {
@@ -15,6 +16,7 @@ const taskPersistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   tasks: persistReducer(taskPersistConfig, taskReducer),
+  theme: themeReducer
 });
 
 export const store = configureStore({
