@@ -18,14 +18,16 @@ interface Props {
 
 const TaskItem = ({ task, onToggle, onDelete, priorityStyle }: Props) => {
   return (
-    <li className="bg-white p-5 rounded-xl shadow flex justify-between items-center hover:shadow-lg transition">
+    <li className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow flex justify-between items-center hover:shadow-lg transition">
+
       <div className="flex items-center gap-4">
+
         <div
           onClick={() => onToggle(task.id, task.status)}
           className={`w-4 h-4 flex items-center justify-center rounded-full border-2 cursor-pointer ${
             task.status === "completed"
               ? "bg-green-500 border-green-500"
-              : "border-gray-400"
+              : "border-gray-400 dark:border-gray-500"
           }`}
         >
           {task.status === "completed" && (
@@ -34,9 +36,9 @@ const TaskItem = ({ task, onToggle, onDelete, priorityStyle }: Props) => {
         </div>
 
         <span
-          className={`text-lg ${
+          className={`text-lg text-gray-900 dark:text-gray-100 ${
             task.status === "completed"
-              ? "line-through text-gray-400"
+              ? "line-through text-gray-400 dark:text-gray-500"
               : ""
           }`}
         >
@@ -50,14 +52,16 @@ const TaskItem = ({ task, onToggle, onDelete, priorityStyle }: Props) => {
         >
           {task.priority}
         </span>
+
       </div>
 
       <button
         onClick={() => onDelete(task.id)}
-        className="text-red-500 hover:text-red-700 transition"
+        className="text-red-500 hover:text-red-700 dark:hover:text-red-400 transition"
       >
         Delete
       </button>
+
     </li>
   );
 };
