@@ -8,17 +8,19 @@ const TaskSkeleton = ({ count = 5 }: Props) => {
       {Array.from({ length: count }).map((_, index) => (
         <li
           key={index}
-          className="bg-white p-5 rounded-xl shadow flex justify-between items-center animate-pulse"
+          className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow flex justify-between items-center animate-pulse"
         >
           <div className="flex items-center gap-4 w-full">
-            <div className="w-4 h-4 rounded-full bg-gray-300"></div>
+            
+            <div className="w-4 h-4 rounded-full bg-gray-300 dark:bg-gray-600"></div>
 
-            <div className="h-5 bg-gray-300 rounded w-1/3"></div>
+            <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded w-1/3"></div>
 
-            <div className="h-5 w-16 bg-gray-300 rounded-full"></div>
+            <div className="h-5 w-16 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+
           </div>
 
-          <div className="h-5 w-16 bg-gray-300 rounded"></div>
+          <div className="h-5 w-16 bg-gray-300 dark:bg-gray-600 rounded"></div>
         </li>
       ))}
     </ul>

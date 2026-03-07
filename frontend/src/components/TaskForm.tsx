@@ -1,4 +1,3 @@
-
 interface Props {
   title: string;
   priority: "low" | "medium" | "high";
@@ -15,18 +14,27 @@ const TaskForm = ({
   onAdd,
 }: Props) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow mb-8 flex gap-3">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow mb-8 flex gap-3">
+
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="What needs to be done?"
-        className="flex-1 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary outline-none"
+        className="flex-1 border border-gray-300 dark:border-gray-600 
+        bg-white dark:bg-gray-900 
+        text-gray-900 dark:text-gray-100 
+        placeholder-gray-400 dark:placeholder-gray-500
+        rounded-lg px-4 py-2 
+        focus:ring-2 focus:ring-primary outline-none"
       />
 
       <select
         value={priority}
         onChange={(e) => setPriority(e.target.value as any)}
-        className="border rounded-lg px-3 py-2"
+        className="border border-gray-300 dark:border-gray-600
+        bg-white dark:bg-gray-900
+        text-gray-900 dark:text-gray-100
+        rounded-lg px-3 py-2"
       >
         <option value="low">Low</option>
         <option value="medium">Medium</option>
@@ -35,10 +43,12 @@ const TaskForm = ({
 
       <button
         onClick={onAdd}
-        className="bg-primary text-white px-6 rounded-lg hover:scale-105 transition"
+        className="bg-primary text-white px-6 rounded-lg 
+        hover:scale-105 transition"
       >
         Add
       </button>
+
     </div>
   );
 };
