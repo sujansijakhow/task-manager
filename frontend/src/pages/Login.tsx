@@ -5,6 +5,7 @@ import { useAppDispatch } from "../hooks";
 import { login } from "../features/auth/authSlice";
 import { fetchTasks, reset } from "../features/task/taskSlice";
 import ThemeToggle from "../components/ThemeToggle";
+import Spinner from "../components/Spinner";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,9 +13,11 @@ const Login = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -22,8 +25,6 @@ const Login = () => {
         `${apiUrl}/auth/login`,
         { email, password }
       );
-
-      // console.log("Login success:", response.data);
 
       dispatch(
         login({
@@ -38,7 +39,9 @@ const Login = () => {
       navigate("/dashboard");
     } catch (error: any) {
       console.error("Login error:", error.response?.data || error.message);
-      alert("Login failed. Please check your credentials.");
+      alert(error.response?.data?.message || "Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -70,9 +73,10 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md 
               focus:outline-none focus:ring-2 focus:ring-primary 
-              bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50"
             />
 
             <input
@@ -81,16 +85,25 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={isLoading}
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md 
               focus:outline-none focus:ring-2 focus:ring-primary 
-              bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50"
             />
 
             <button
               type="submit"
-              className="w-full bg-primary text-white py-3 rounded-md hover:opacity-90 transition"
+              disabled={isLoading}
+              className="w-full bg-primary text-white py-3 rounded-md hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
-              Login
+              {isLoading ? (
+                <>
+                  <Spinner size="md" className="text-white" />
+                  <span>Logging in...</span>
+                </>
+              ) : (
+                <span>Login</span>
+              )}
             </button>
 
           </form>
