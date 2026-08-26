@@ -28,6 +28,8 @@ const Dashboard = () => {
   const [filter, setFilter] = useState<"all" | "completed" | "pending">("all");
   const [sort, setSort] = useState<"latest" | "oldest" | "priority">("latest");
 
+  const [isAdding, setIsAdding] = useState(false);
+
   const [open, setOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
 
@@ -63,11 +65,18 @@ const Dashboard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleAdd = useCallback(() => {
+  const handleAdd = useCallback(async () => {
     if (title.trim()) {
-      dispatch(addTask({ title, priority, projectId: "default" }));
-      setTitle("");
-      setPriority("low");
+      setIsAdding(true);
+      try {
+        await dispatch(addTask({ title: title.trim(), priority, projectId: "default" })).unwrap();
+        setTitle("");
+        setPriority("low");
+      } catch (err) {
+        console.error("Failed to add task:", err);
+      } finally {
+        setIsAdding(false);
+      }
     }
   }, [title, priority, dispatch]);
 
@@ -195,6 +204,7 @@ const Dashboard = () => {
           setTitle={setTitle}
           setPriority={setPriority}
           onAdd={handleAdd}
+          isAdding={isAdding}
         />
 
         {/* FILTERS */}
