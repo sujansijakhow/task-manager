@@ -46,7 +46,7 @@ export const getTasks = async (req: Request, res: Response) => {
 export const updateTask = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const taskId = req.params.id;
+    const taskId = req.params.id as string;
     const { title, priority, status, projectId } = req.body;
 
     const existingTask = await prisma.task.findFirst({
@@ -77,7 +77,7 @@ export const updateTask = async (req: Request, res: Response) => {
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const taskId = req.params.id;
+    const taskId = req.params.id as string;
 
     const existingTask = await prisma.task.findFirst({
       where: { id: taskId, userId },
