@@ -31,5 +31,50 @@
     "status": "pending",
     "createdAt": "2026-03-05T15:34:51.431Z",
     "userId": "a6e754ba-aa3f-4b63-8bbe-59123f233e83"
+  },
+  {
+    "id": "42395944-2919-4532-95b7-a0e021967f7e",
+    "title": "do dishes",
+    "projectId": "default",
+    "priority": "low",
+    "status": "completed",
+    "createdAt": "2026-03-08T09:03:08.297Z",
+    "userId": "39db1ab7-152d-40f9-8eaa-eef134cfd727"
+  },
+  {
+    "id": "eee71779-2980-4959-bb68-6368e21a1f23",
+    "title": "do work",
+    "projectId": "default",
+    "priority": "medium",
+    "status": "pending",
+    "createdAt": "2026-03-08T09:03:16.724Z",
+    "userId": "39db1ab7-152d-40f9-8eaa-eef134cfd727"
+  },
+  {
+    "id": "1aeee713-8120-4ae9-ac73-bf0d33d1b272",
+    "title": "do hw",
+    "projectId": "default",
+    "priority": "low",
+    "status": "completed",
+    "createdAt": "2026-06-06T15:24:52.001Z",
+    "userId": "fb8561e5-5c2e-4ccc-9059-b3207e77fd5d"
+  },
+  {
+    "id": "6d1e7159-d196-43ed-bb6e-c993b0729070",
+    "title": "do dishes",
+    "projectId": "default",
+    "priority": "low",
+    "status": "pending",
+    "createdAt": "2026-08-08T05:17:29.579Z",
+    "userId": "ebb8497b-e252-4772-ae3c-3e0ce7752dbe"
+  },
+  {
+    "id": "057e4398-dda5-4d05-a74e-29e521452c9c",
+    "title": "do assignments",
+    "projectId": "default",
+    "priority": "low",
+    "status": "pending",
+    "createdAt": "2026-08-08T05:17:44.645Z",
+    "userId": "ebb8497b-e252-4772-ae3c-3e0ce7752dbe"
   }
 ]
