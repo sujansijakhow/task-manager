@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAppDispatch } from "../hooks";
 import { login } from "../features/auth/authSlice";
 import { fetchTasks, reset } from "../features/task/taskSlice";
-import ThemeToggle from "../components/ThemeToggle"; 
+import ThemeToggle from "../components/ThemeToggle";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const Login = () => {
         { email, password }
       );
 
-      console.log("Login success:", response.data);
+      // console.log("Login success:", response.data);
 
       dispatch(
         login({
