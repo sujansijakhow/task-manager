@@ -1,11 +1,16 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
+import { useAppDispatch } from "../hooks";
+import { login } from "../features/auth/authSlice";
+import { fetchTasks, reset } from "../features/task/taskSlice";
 import ThemeToggle from "../components/ThemeToggle";
 import Spinner from "../components/Spinner";
 
 const Register = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +32,38 @@ const Register = () => {
     } catch (error: any) {
       console.error("Register error:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) {
+      alert("Google sign-in failed. No credentials received.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      const response = await axios.post(`${apiUrl}/auth/google`, {
+        credential: credentialResponse.credential,
+      });
+
+      dispatch(
+        login({
+          token: response.data.token,
+          email: response.data.email,
+        })
+      );
+
+      dispatch(reset());
+      dispatch(fetchTasks());
+
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Google sign-in error:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Google sign-up failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -95,7 +132,30 @@ const Register = () => {
 
           </form>
 
-          <p className="text-center text-gray-500 dark:text-gray-300 mt-4">
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          {/* Google SSO Button */}
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => alert("Google Sign-up failed. Please try again.")}
+              shape="rectangular"
+              size="large"
+              text="signup_with"
+            />
+          </div>
+
+          <p className="text-center text-gray-500 dark:text-gray-300 mt-6">
             Already have an account?{" "}
             <Link
               to="/"

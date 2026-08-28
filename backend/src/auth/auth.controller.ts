@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
 import prisma from "../prisma";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -25,6 +28,7 @@ export const register = async (req: Request, res: Response) => {
       data: {
         email,
         password: hashedPassword,
+        provider: "local",
       },
     });
 
@@ -51,6 +55,12 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    if (!user.password) {
+      return res.status(400).json({
+        message: "This account was registered using Google SSO. Please log in with Google.",
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -66,5 +76,59 @@ export const login = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const googleAuth = async (req: Request, res: Response) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ message: "Google credential is required" });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({ message: "Invalid Google token payload" });
+    }
+
+    const { email, sub: googleId } = payload;
+
+    let user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email,
+          provider: "google",
+          providerId: googleId,
+        },
+      });
+    } else if (!user.providerId) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          providerId: googleId,
+        },
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1d" }
+    );
+
+    res.json({ token, email: user.email });
+  } catch (error: any) {
+    console.error("Google Auth error:", error);
+    res.status(500).json({ message: "Failed to authenticate with Google" });
   }
 };
